@@ -15,3 +15,5 @@ export const Badge = ({
 };
 
 export default Badge;
+
+// 'primary'
