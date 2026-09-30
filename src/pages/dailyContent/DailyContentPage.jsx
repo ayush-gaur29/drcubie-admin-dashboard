@@ -198,7 +198,7 @@ export const DailyContentPage = () => {
       >
         <div>
           <h2 className="page-header-title" style={{ fontSize: '1.35rem', fontWeight: 700, color: 'var(--text-main)' }}>
-            Daily Content Programming
+            Daily Content
           </h2>
           <p className="page-header-subtitle" style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
             Schedule and synchronize Today's Spark, Video, Audio, and Recommendations for the mobile application
@@ -245,7 +245,7 @@ export const DailyContentPage = () => {
             )}
             <div>
               <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>
-                Today's Programming ({formatDate(todayStr)})
+                Today’s Content ({formatDate(todayStr)})
               </div>
               <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
                 {todayEntry ? (
