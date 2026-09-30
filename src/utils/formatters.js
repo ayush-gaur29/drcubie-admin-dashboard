@@ -122,3 +122,17 @@ export const parseDurationToSeconds = (durationStr) => {
   const num = parseInt(str, 10);
   return isNaN(num) ? 0 : num;
 };
+
+/**
+ * Format currency amount with symbol (e.g. 9.99 -> "$9.99")
+ */
+export const formatCurrency = (amount) => {
+  const num = Number(amount);
+  if (isNaN(num)) return '$0.00';
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(num);
+};

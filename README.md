@@ -255,6 +255,7 @@ The application connects to the standard Dr. Cubie Inspiration Supabase database
 - `public.daily_content`: Calendar schedule mapping dates (`content_date`) to featured Sparks.
 - `public.recommendations`: Curated recommendations with priority ordering.
 - `public.notifications`: User notifications with `type` check constraint.
+- `public.membership_plans`: Dynamic subscription/membership plans with pricing, billing frequencies, trial days, and features.
 
 ### Storage Buckets
 - `videos`: Max 100MB (Public read, admin write).

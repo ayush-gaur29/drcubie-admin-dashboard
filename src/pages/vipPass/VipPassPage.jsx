@@ -43,6 +43,16 @@ import {
 } from '../../services/vipPass/vipPassAdminService';
 import { useToast } from '../../context/ToastContext';
 import { formatDate } from '../../utils/formatters';
+import PlanFormModal from '../../components/plans/PlanFormModal';
+import MembershipPlansSection from '../../components/plans/MembershipPlansSection';
+import {
+  fetchMembershipPlans,
+  createMembershipPlan,
+  updateMembershipPlan,
+  toggleMembershipPlanStatus,
+  deleteMembershipPlan,
+  isTableMissingError
+} from '../../services/membershipPlans/membershipPlansAdminService';
 
 const TYPE_OPTIONS = [
   { value: 'all', label: 'All Content Types' },
@@ -120,7 +130,34 @@ export const VipPassPage = () => {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewItem, setPreviewItem] = useState(null);
 
+  // Membership Plans state
+  const [plans, setPlans] = useState([]);
+  const [plansLoading, setPlansLoading] = useState(true);
+  const [plansTableMissing, setPlansTableMissing] = useState(false);
+  const [planModalOpen, setPlanModalOpen] = useState(false);
+  const [editingPlan, setEditingPlan] = useState(null);
+  const [planSaving, setPlanSaving] = useState(false);
+
   const { showToast } = useToast();
+
+  // Load membership plans directly from Supabase
+  const loadPlans = useCallback(async () => {
+    setPlansLoading(true);
+    try {
+      const data = await fetchMembershipPlans();
+      setPlans(data || []);
+      setPlansTableMissing(false);
+    } catch (err) {
+      if (err.code === 'TABLE_NOT_FOUND' || isTableMissingError(err)) {
+        setPlansTableMissing(true);
+      } else {
+        console.error('[VipPassPage] Error fetching membership plans:', err);
+      }
+      setPlans([]);
+    } finally {
+      setPlansLoading(false);
+    }
+  }, []);
 
   // Load all data
   const loadData = useCallback(async (isRefresh = false) => {
@@ -144,6 +181,9 @@ export const VipPassPage = () => {
       setVipMembers(membersData || []);
       setVipSettings(getLocalVipSettings());
 
+      // Fetch dynamic membership plans concurrently
+      await loadPlans();
+
       if (isRefresh) {
         showToast('success', 'VIP Pass data refreshed from Supabase.');
       }
@@ -154,11 +194,82 @@ export const VipPassPage = () => {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [selectedType, selectedVipFilter, selectedStatus, searchQuery, showToast]);
+  }, [selectedType, selectedVipFilter, selectedStatus, searchQuery, showToast, loadPlans]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // Membership Plans handlers
+  const handleOpenCreatePlan = () => {
+    setEditingPlan(null);
+    setPlanModalOpen(true);
+  };
+
+  const handleOpenEditPlan = (plan) => {
+    setEditingPlan(plan);
+    setPlanModalOpen(true);
+  };
+
+  const handleSavePlan = async (formData) => {
+    setPlanSaving(true);
+    try {
+      if (editingPlan?.id) {
+        await updateMembershipPlan(editingPlan.id, formData);
+        showToast('success', `Membership plan "${formData.name}" updated successfully.`);
+      } else {
+        await createMembershipPlan(formData);
+        showToast('success', `Membership plan "${formData.name}" created successfully.`);
+      }
+      setPlanModalOpen(false);
+      setEditingPlan(null);
+      await loadPlans();
+    } catch (err) {
+      if (err.code === 'TABLE_NOT_FOUND' || isTableMissingError(err)) {
+        setPlansTableMissing(true);
+        showToast('error', "Database table 'membership_plans' not found. Please run the migration SQL.");
+      } else {
+        showToast('error', err.message || 'Failed to save membership plan.');
+      }
+    } finally {
+      setPlanSaving(false);
+    }
+  };
+
+  const handleTogglePlanStatus = async (plan) => {
+    const nextStatus = !plan.is_active;
+    try {
+      await toggleMembershipPlanStatus(plan.id, nextStatus);
+      showToast(
+        'success',
+        `Plan "${plan.name}" is now ${nextStatus ? 'active' : 'inactive'}.`
+      );
+      await loadPlans();
+    } catch (err) {
+      showToast('error', err.message || 'Failed to update plan status.');
+    }
+  };
+
+  const handleDeletePlan = (plan) => {
+    setConfirmTitle(`Delete Plan "${plan.name}"?`);
+    setConfirmMessage(
+      `Are you sure you want to permanently delete the "${plan.name}" membership plan? This action removes the plan record from the database and cannot be undone.`
+    );
+    setConfirmAction(() => async () => {
+      setConfirmLoading(true);
+      try {
+        await deleteMembershipPlan(plan.id);
+        showToast('success', `Plan "${plan.name}" was permanently deleted.`);
+        setConfirmOpen(false);
+        await loadPlans();
+      } catch (err) {
+        showToast('error', err.message || 'Failed to delete plan.');
+      } finally {
+        setConfirmLoading(false);
+      }
+    });
+    setConfirmOpen(true);
+  };
 
   // Open Add VIP Content modal
   const handleOpenAddContent = async () => {
@@ -345,6 +456,14 @@ export const VipPassPage = () => {
 
         <div className="page-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
           <Button
+            variant="primary"
+            size="sm"
+            icon={Plus}
+            onClick={handleOpenCreatePlan}
+          >
+            Create Plans
+          </Button>
+          <Button
             variant="secondary"
             size="sm"
             icon={RefreshCw}
@@ -424,7 +543,16 @@ export const VipPassPage = () => {
         </div>
       </div>
 
-
+      {/* Membership Plans Management Section */}
+      <MembershipPlansSection
+        plans={plans}
+        loading={plansLoading}
+        tableMissing={plansTableMissing}
+        onCreatePlan={handleOpenCreatePlan}
+        onEditPlan={handleOpenEditPlan}
+        onToggleStatus={handleTogglePlanStatus}
+        onDeletePlan={handleDeletePlan}
+      />
 
       {/* Main VIP Content Management Section */}
       <div className="card" style={{ marginBottom: '2rem' }}>
@@ -1137,6 +1265,18 @@ export const VipPassPage = () => {
         }}
         item={previewItem}
         type={previewItem?.content_type || 'spark'}
+      />
+
+      {/* Plan Form Modal (Create / Edit) */}
+      <PlanFormModal
+        isOpen={planModalOpen}
+        onClose={() => {
+          setPlanModalOpen(false);
+          setEditingPlan(null);
+        }}
+        onSave={handleSavePlan}
+        initialData={editingPlan}
+        loading={planSaving}
       />
 
       {/* Confirmation Dialog */}
