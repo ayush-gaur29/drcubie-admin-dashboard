@@ -3041,6 +3041,12 @@ a:hover {
   cursor: not-allowed;
 }
 
+.btn-page.active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+}
+
 .pagination-page-indicator {
   font-size: 0.8rem;
   font-weight: 600;

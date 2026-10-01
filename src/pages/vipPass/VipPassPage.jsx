@@ -96,6 +96,10 @@ export const VipPassPage = () => {
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Pagination state for VIP Content Catalog (10 per page)
+  const PAGE_SIZE = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+
   // VIP Members state
   const [vipMembers, setVipMembers] = useState([]);
   const [membersLoading, setMembersLoading] = useState(false);
@@ -420,6 +424,41 @@ export const VipPassPage = () => {
     return contentList.find((item) => item.is_featured && item.is_vip);
   }, [contentList]);
 
+  // Reset pagination to page 1 whenever filters or search change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedType, selectedVipFilter, selectedStatus, searchQuery]);
+
+  // Pagination calculation for VIP Content Catalog (10 per page)
+  const totalPages = Math.max(1, Math.ceil(contentList.length / PAGE_SIZE));
+
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages);
+    }
+  }, [totalPages, currentPage]);
+
+  const paginatedContent = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return contentList.slice(start, start + PAGE_SIZE);
+  }, [contentList, currentPage]);
+
+  const getPageNumbers = () => {
+    const pages = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (currentPage <= 4) {
+        pages.push(1, 2, 3, 4, 5, '...', totalPages);
+      } else if (currentPage >= totalPages - 3) {
+        pages.push(1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+      }
+    }
+    return pages;
+  };
+
   // Candidates for add content modal
   const currentAddCandidates =
     addType === 'spark'
@@ -653,7 +692,7 @@ export const VipPassPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {contentList.map((item) => {
+                  {paginatedContent.map((item) => {
                     let TypeIcon = Sparkles;
                     if (item.content_type === 'video') TypeIcon = Video;
                     if (item.content_type === 'audio') TypeIcon = Headphones;
@@ -789,7 +828,7 @@ export const VipPassPage = () => {
 
             {/* Mobile Cards View */}
             <div className="recommendations-mobile-cards" style={{ padding: '1rem' }}>
-              {contentList.map((item) => {
+              {paginatedContent.map((item) => {
                 let TypeIcon = Sparkles;
                 if (item.content_type === 'video') TypeIcon = Video;
                 if (item.content_type === 'audio') TypeIcon = Headphones;
@@ -875,6 +914,68 @@ export const VipPassPage = () => {
                 );
               })}
             </div>
+
+            {/* Pagination Controls - shown only when there are more than 10 entries */}
+            {contentList.length > PAGE_SIZE && (
+              <div
+                className="table-pagination"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '0.85rem 1.25rem',
+                  borderTop: '1px solid var(--border-subtle)',
+                  flexWrap: 'wrap',
+                  gap: '0.75rem'
+                }}
+              >
+                <div className="pagination-info" style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                  Showing {(currentPage - 1) * PAGE_SIZE + 1} to{' '}
+                  {Math.min(currentPage * PAGE_SIZE, contentList.length)} of {contentList.length} entries
+                </div>
+
+                <div className="pagination-controls" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <button
+                    type="button"
+                    className="btn-page"
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </button>
+
+                  {getPageNumbers().map((p, idx) => (
+                    <button
+                      key={`page-${idx}-${p}`}
+                      type="button"
+                      className={`btn-page ${currentPage === p ? 'active' : ''}`}
+                      style={
+                        currentPage === p
+                          ? {
+                              backgroundColor: 'var(--primary)',
+                              color: '#ffffff',
+                              borderColor: 'var(--primary)'
+                            }
+                          : {}
+                      }
+                      onClick={() => typeof p === 'number' && setCurrentPage(p)}
+                      disabled={p === '...'}
+                    >
+                      {p}
+                    </button>
+                  ))}
+
+                  <button
+                    type="button"
+                    className="btn-page"
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
           </>
         )}
       </div>
