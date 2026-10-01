@@ -12,7 +12,8 @@ const ROUTE_TITLES = {
   '/daily-content': { title: 'Daily Content Schedule', subtitle: 'Schedule and synchronize Today screen features' },
   '/users': { title: 'User Management', subtitle: 'View registered member profiles and VIP access' },
   '/notifications': { title: 'Notification Center', subtitle: 'Broadcast notifications to members or VIPs' },
-  '/vip-pass': { title: 'VIP Pass Management', subtitle: 'Manage VIP content catalog, entitlements, and presentation' }
+  '/vip-pass': { title: 'VIP Pass Management', subtitle: 'Manage VIP content catalog, entitlements, and presentation' },
+  '/payments': { title: 'Payment Analytics', subtitle: 'Track payments, revenue, membership plans, and customer metrics' }
 };
 
 export const Header = ({ onOpenMobileMenu }) => {

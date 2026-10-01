@@ -10,7 +10,7 @@ export const isTableMissingError = (error) => {
   return (
     code === 'PGRST205' ||
     code === '42P01' ||
-    msg.includes('membership_plans') && (msg.includes('not find') || msg.includes('schema cache') || msg.includes('does not exist'))
+    (msg.includes('table') && msg.includes('membership_plans') && (msg.includes('does not exist') || msg.includes('not find') || msg.includes('relation')))
   );
 };
 
@@ -97,9 +97,6 @@ export const createMembershipPlan = async (planData) => {
   const displayOrderNum = parseInt(planData.display_order, 10);
   const displayOrder = isNaN(displayOrderNum) ? 0 : displayOrderNum;
 
-  const trialDaysNum = parseInt(planData.trial_days, 10);
-  const trialDays = isNaN(trialDaysNum) || trialDaysNum < 0 ? 0 : trialDaysNum;
-
   // Clean features array (remove empty strings)
   const cleanFeatures = Array.isArray(planData.features)
     ? planData.features.map((f) => (typeof f === 'string' ? f.trim() : '')).filter(Boolean)
@@ -112,7 +109,6 @@ export const createMembershipPlan = async (planData) => {
     billing_period: planData.billing_period || 'Monthly',
     description: planData.description?.trim() || null,
     discount_text: planData.discount_text?.trim() || null,
-    trial_days: trialDays,
     features: cleanFeatures,
     is_active: planData.is_active !== undefined ? Boolean(planData.is_active) : true,
     display_order: displayOrder
@@ -160,9 +156,6 @@ export const updateMembershipPlan = async (id, planData) => {
   const displayOrderNum = parseInt(planData.display_order, 10);
   const displayOrder = isNaN(displayOrderNum) ? 0 : displayOrderNum;
 
-  const trialDaysNum = parseInt(planData.trial_days, 10);
-  const trialDays = isNaN(trialDaysNum) || trialDaysNum < 0 ? 0 : trialDaysNum;
-
   const cleanFeatures = Array.isArray(planData.features)
     ? planData.features.map((f) => (typeof f === 'string' ? f.trim() : '')).filter(Boolean)
     : [];
@@ -174,7 +167,6 @@ export const updateMembershipPlan = async (id, planData) => {
     billing_period: planData.billing_period || 'Monthly',
     description: planData.description?.trim() || null,
     discount_text: planData.discount_text?.trim() || null,
-    trial_days: trialDays,
     features: cleanFeatures,
     is_active: planData.is_active !== undefined ? Boolean(planData.is_active) : true,
     display_order: displayOrder,
@@ -247,12 +239,39 @@ export const deleteMembershipPlan = async (id) => {
   if (!supabase) throw new Error('Supabase client is not initialized.');
 
   try {
+    // 1. Clean up references in public.memberships first so foreign key constraint is not violated
+    try {
+      await supabase
+        .from('memberships')
+        .delete()
+        .eq('plan_id', id);
+    } catch (memCleanupErr) {
+      console.warn('[MembershipPlansAdminService] Notice during memberships reference cleanup:', memCleanupErr?.message);
+    }
+
+    // 2. Disassociate any profiles referencing this plan
+    try {
+      await supabase
+        .from('profiles')
+        .update({ vip_plan_id: null })
+        .eq('vip_plan_id', id);
+    } catch (profCleanupErr) {
+      console.warn('[MembershipPlansAdminService] Notice during profiles reference cleanup:', profCleanupErr?.message);
+    }
+
+    // 3. Delete the membership plan
     const { error } = await supabase
       .from('membership_plans')
       .delete()
       .eq('id', id);
 
     if (error) {
+      if (error.code === '23503' || error.message?.includes('foreign key constraint')) {
+        throw new Error(
+          'Cannot permanently delete this plan because existing customer memberships are linked to it. You can deactivate the plan instead to hide it from members.'
+        );
+      }
+
       if (isTableMissingError(error)) {
         const customErr = new Error("The 'membership_plans' table does not exist in Supabase yet. Please execute the migration SQL.");
         customErr.code = 'TABLE_NOT_FOUND';

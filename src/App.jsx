@@ -16,12 +16,13 @@ import DailyContentPage from './pages/dailyContent/DailyContentPage';
 import UsersPage from './pages/users/UsersPage';
 import NotificationsPage from './pages/notifications/NotificationsPage';
 import VipPassPage from './pages/vipPass/VipPassPage';
+import PaymentAnalyticsPage from './pages/payments/PaymentAnalyticsPage';
 
 export const App = () => {
   return (
     <AuthProvider>
       <ToastProvider>
-        <BrowserRouter>
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <Routes>
             {/* Public Auth Route */}
             <Route path="/login" element={<LoginPage />} />
@@ -45,6 +46,7 @@ export const App = () => {
               <Route path="users" element={<UsersPage />} />
               <Route path="notifications" element={<NotificationsPage />} />
               <Route path="vip-pass" element={<VipPassPage />} />
+              <Route path="payments" element={<PaymentAnalyticsPage />} />
             </Route>
 
             {/* Catch-all fallback */}

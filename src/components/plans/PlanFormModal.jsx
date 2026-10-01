@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, CheckCircle2, AlertCircle, Sparkles, Tag, DollarSign, Calendar, Clock, Layers } from 'lucide-react';
+import { Plus, Trash2, CheckCircle2 } from 'lucide-react';
 import Modal from '../ui/Modal';
 import Input from '../ui/Input';
 import Select from '../ui/Select';
@@ -18,15 +18,6 @@ const BILLING_PERIOD_OPTIONS = [
   { value: 'Custom', label: 'Custom' }
 ];
 
-const FEATURE_SUGGESTIONS = [
-  'Unlimited Daily Sparks & Contemplations',
-  'Exclusive VIP Video Masterclasses',
-  'Ad-Free Private Audio Archives',
-  'Offline Sanctuary Playback',
-  'Personalized Daily Practice Schedule',
-  'Early Access to New Dr. Cubie Releases'
-];
-
 export const PlanFormModal = ({
   isOpen,
   onClose,
@@ -42,8 +33,6 @@ export const PlanFormModal = ({
     price: '',
     billing_period: 'Monthly',
     description: '',
-    discount_text: '',
-    trial_days: '0',
     is_active: true,
     display_order: '0',
     features: []
@@ -58,31 +47,31 @@ export const PlanFormModal = ({
         setFormData({
           name: initialData.name || '',
           plan_type: initialData.plan_type || 'Monthly',
-          price: initialData.price !== undefined && initialData.price !== null ? String(initialData.price) : '',
+          price:
+            initialData.price !== undefined && initialData.price !== null
+              ? String(initialData.price)
+              : '',
           billing_period: initialData.billing_period || 'Monthly',
           description: initialData.description || '',
-          discount_text: initialData.discount_text || '',
-          trial_days: initialData.trial_days !== undefined && initialData.trial_days !== null ? String(initialData.trial_days) : '0',
-          is_active: initialData.is_active !== undefined ? Boolean(initialData.is_active) : true,
-          display_order: initialData.display_order !== undefined && initialData.display_order !== null ? String(initialData.display_order) : '0',
+          is_active:
+            initialData.is_active !== undefined ? Boolean(initialData.is_active) : true,
+          display_order:
+            initialData.display_order !== undefined && initialData.display_order !== null
+              ? String(initialData.display_order)
+              : '0',
           features: Array.isArray(initialData.features) ? [...initialData.features] : []
         });
       } else {
+        // Create mode: start with clean empty fields and empty features list
         setFormData({
           name: '',
           plan_type: 'Monthly',
           price: '',
           billing_period: 'Monthly',
           description: '',
-          discount_text: '',
-          trial_days: '0',
           is_active: true,
           display_order: '0',
-          features: [
-            'Full access to all daily Sparks & reflections',
-            'Exclusive video masterclasses',
-            'Private audio contemplation archives'
-          ]
+          features: []
         });
       }
       setFeatureInput('');
@@ -128,14 +117,6 @@ export const PlanFormModal = ({
     }));
   };
 
-  const handleAddSuggestedFeature = (feature) => {
-    if (formData.features.includes(feature)) return;
-    setFormData((prev) => ({
-      ...prev,
-      features: [...prev.features, feature]
-    }));
-  };
-
   const validate = () => {
     const newErrors = {};
 
@@ -159,13 +140,6 @@ export const PlanFormModal = ({
       }
     }
 
-    if (formData.trial_days !== '') {
-      const trialVal = parseInt(formData.trial_days, 10);
-      if (isNaN(trialVal) || trialVal < 0) {
-        newErrors.trial_days = 'Trial days must be 0 or higher';
-      }
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -178,7 +152,8 @@ export const PlanFormModal = ({
       ...formData,
       price: parseFloat(formData.price) || 0,
       display_order: parseInt(formData.display_order, 10) || 0,
-      trial_days: parseInt(formData.trial_days, 10) || 0,
+      // Preserve existing database values if editing an existing plan
+      discount_text: initialData?.discount_text !== undefined ? initialData.discount_text : null,
       features: formData.features
     });
   };
@@ -258,35 +233,7 @@ export const PlanFormModal = ({
           />
         </div>
 
-        {/* Row 3: Discount / Savings Text & Trial Days */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
-          <Input
-            label="Discount / Savings Tag (Optional)"
-            name="discount_text"
-            placeholder="e.g. Save 35%, Most Popular, Best Value"
-            value={formData.discount_text}
-            onChange={(e) => setFormData({ ...formData, discount_text: e.target.value })}
-            helperText="High-converting callout badge shown on the plan card."
-          />
-
-          <Input
-            label="Trial Period (Days)"
-            name="trial_days"
-            type="number"
-            min="0"
-            step="1"
-            placeholder="0"
-            value={formData.trial_days}
-            onChange={(e) => {
-              setFormData({ ...formData, trial_days: e.target.value });
-              if (errors.trial_days) setErrors({ ...errors, trial_days: null });
-            }}
-            error={errors.trial_days}
-            helperText="Number of free trial days before first billing (0 = no trial)."
-          />
-        </div>
-
-        {/* Short Description */}
+        {/* Row 3: Short Description */}
         <Textarea
           label="Short Description"
           name="description"
@@ -295,6 +242,7 @@ export const PlanFormModal = ({
           value={formData.description}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           helperText="Provides context and editorial warmth for this tier."
+          style={{ marginBottom: 0 }}
         />
 
         {/* Features / Benefits Builder */}
@@ -306,20 +254,18 @@ export const PlanFormModal = ({
             backgroundColor: 'var(--bg-muted)'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-            <div>
-              <label className="form-label" style={{ marginBottom: '2px', fontWeight: 600 }}>
-                Features & Member Benefits ({formData.features.length})
-              </label>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                Add the key privileges included in this membership plan.
-              </div>
+          <div style={{ marginBottom: '0.75rem' }}>
+            <label className="form-label" style={{ marginBottom: '2px', fontWeight: 600 }}>
+              Features & Member Benefits ({formData.features.length})
+            </label>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+              Add the key privileges included in this membership plan.
             </div>
           </div>
 
           {/* Add Feature Input Row */}
-          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
-            <div style={{ flex: 1 }}>
+          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem', alignItems: 'flex-start' }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <input
                 type="text"
                 className="form-input"
@@ -332,6 +278,7 @@ export const PlanFormModal = ({
                     handleAddFeature();
                   }
                 }}
+                style={{ width: '100%', marginBottom: 0 }}
               />
             </div>
             <Button
@@ -340,44 +287,10 @@ export const PlanFormModal = ({
               icon={Plus}
               onClick={handleAddFeature}
               disabled={!featureInput.trim()}
+              style={{ flexShrink: 0 }}
             >
               Add
             </Button>
-          </div>
-
-          {/* Quick Suggestions */}
-          <div style={{ marginBottom: '1rem' }}>
-            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '0.4rem', fontWeight: 600 }}>
-              Quick Suggestions:
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-              {FEATURE_SUGGESTIONS.map((sug, i) => {
-                const isAdded = formData.features.includes(sug);
-                return (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => handleAddSuggestedFeature(sug)}
-                    disabled={isAdded}
-                    style={{
-                      fontSize: '0.72rem',
-                      padding: '3px 8px',
-                      borderRadius: 'var(--radius-xs)',
-                      border: '1px dashed var(--border-subtle)',
-                      backgroundColor: isAdded ? 'var(--bg-card)' : 'transparent',
-                      color: isAdded ? 'var(--text-faint)' : 'var(--text-secondary)',
-                      cursor: isAdded ? 'default' : 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px'
-                    }}
-                  >
-                    <span>{isAdded ? '✓' : '+'}</span>
-                    <span>{sug}</span>
-                  </button>
-                );
-              })}
-            </div>
           </div>
 
           {/* Added Features List */}
@@ -393,7 +306,7 @@ export const PlanFormModal = ({
                 border: '1px dashed var(--border-subtle)'
               }}
             >
-              No features added yet. Add benefits above or click the quick suggestions.
+              No features added yet. Type a feature above and click Add.
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>

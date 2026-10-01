@@ -113,15 +113,11 @@ export const MembershipPlansSection = ({
             <h3 className="card-title">Membership Plans</h3>
           </div>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-            Configure and manage subscription tiers, pricing, trial periods, and privileges stored in <code>public.membership_plans</code>
+            Configure and manage subscription tiers, pricing, trial periods, and privileges stored in public.
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-          <Button variant="primary" size="sm" icon={Plus} onClick={onCreatePlan}>
-            Create Plans
-          </Button>
-        </div>
+
       </div>
 
       {/* Database Setup Helper Banner (shown only if table is not yet in Supabase schema cache) */}
@@ -261,8 +257,8 @@ export const MembershipPlansSection = ({
                               plan.plan_type === 'Annual'
                                 ? 'vip'
                                 : plan.plan_type === 'Monthly'
-                                ? 'primary'
-                                : 'muted'
+                                  ? 'primary'
+                                  : 'muted'
                             }
                           >
                             {plan.plan_type || 'Monthly'}
@@ -448,8 +444,8 @@ export const MembershipPlansSection = ({
                             plan.plan_type === 'Annual'
                               ? 'vip'
                               : plan.plan_type === 'Monthly'
-                              ? 'primary'
-                              : 'muted'
+                                ? 'primary'
+                                : 'muted'
                           }
                         >
                           {plan.plan_type || 'Monthly'}

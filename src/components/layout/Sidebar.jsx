@@ -10,6 +10,7 @@ import {
   Users,
   Bell,
   Crown,
+  CreditCard,
   LogOut,
   X
 } from 'lucide-react';
@@ -24,7 +25,8 @@ const NAV_ITEMS = [
   { path: '/daily-content', label: 'Daily Content', icon: Calendar },
   { path: '/users', label: 'Users', icon: Users },
   { path: '/notifications', label: 'Notifications', icon: Bell },
-  { path: '/vip-pass', label: 'VIP Pass', icon: Crown }
+  { path: '/vip-pass', label: 'VIP Pass', icon: Crown },
+  { path: '/payments', label: 'Payments', icon: CreditCard }
 ];
 
 export const Sidebar = ({ isOpen, onClose }) => {

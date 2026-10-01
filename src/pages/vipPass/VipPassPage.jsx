@@ -456,14 +456,6 @@ export const VipPassPage = () => {
 
         <div className="page-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
           <Button
-            variant="primary"
-            size="sm"
-            icon={Plus}
-            onClick={handleOpenCreatePlan}
-          >
-            Create Plans
-          </Button>
-          <Button
             variant="secondary"
             size="sm"
             icon={RefreshCw}
@@ -472,6 +464,16 @@ export const VipPassPage = () => {
           >
             Refresh
           </Button>
+
+          <Button
+            variant="primary"
+            size="sm"
+            icon={Plus}
+            onClick={handleOpenCreatePlan}
+          >
+            Create Plans
+          </Button>
+
         </div>
       </div>
 
