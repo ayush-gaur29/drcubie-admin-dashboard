@@ -1,12 +1,14 @@
 import React from 'react';
 import { Sparkles, Video, Headphones, Eye, ArrowUpRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Badge from '../ui/Badge';
 import Pagination from '../ui/Pagination';
+import ActionMenu from '../ui/ActionMenu';
 import usePagination from '../../hooks/usePagination';
 import { formatDate } from '../../utils/formatters';
 
 export const RecentContentTable = ({ items = [] }) => {
+  const navigate = useNavigate();
   const {
     currentPage,
     setCurrentPage,
@@ -87,15 +89,18 @@ export const RecentContentTable = ({ items = [] }) => {
                     )}
                   </td>
                   <td>{formatDate(item.created_at)}</td>
-                  <td>
-                    <Link
-                      to={linkTarget}
-                      className="btn btn-ghost btn-sm"
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-                    >
-                      <span>Manage</span>
-                      <ArrowUpRight size={14} />
-                    </Link>
+                  <td style={{ textAlign: 'right' }}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                      <ActionMenu
+                        items={[
+                          {
+                            label: `Manage ${typeLabel}`,
+                            icon: ArrowUpRight,
+                            onClick: () => navigate(linkTarget)
+                          }
+                        ]}
+                      />
+                    </div>
                   </td>
                 </tr>
               );

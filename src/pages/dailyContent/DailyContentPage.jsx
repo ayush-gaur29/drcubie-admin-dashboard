@@ -24,6 +24,7 @@ import EmptyState from '../../components/ui/EmptyState';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import Modal from '../../components/ui/Modal';
 import Pagination from '../../components/ui/Pagination';
+import ActionMenu from '../../components/ui/ActionMenu';
 import usePagination from '../../hooks/usePagination';
 import {
   fetchDailyContentList,
@@ -386,24 +387,25 @@ export const DailyContentPage = () => {
                       <td style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
                         {formatDate(entry.updated_at || entry.created_at)}
                       </td>
-                      <td>
+                      <td style={{ textAlign: 'right' }}>
                         <div className="table-actions" style={{ justifyContent: 'flex-end', gap: '0.25rem' }}>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            icon={Edit2}
-                            onClick={() => handleOpenEdit(entry)}
-                            title="Edit daily schedule"
-                          />
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            icon={Trash2}
-                            onClick={() => {
-                              setItemToDelete(entry);
-                              setDeleteOpen(true);
-                            }}
-                            title="Remove scheduled date"
+                          <ActionMenu
+                            items={[
+                              {
+                                label: 'Edit',
+                                icon: Edit2,
+                                onClick: () => handleOpenEdit(entry)
+                              },
+                              {
+                                label: 'Delete',
+                                icon: Trash2,
+                                danger: true,
+                                onClick: () => {
+                                  setItemToDelete(entry);
+                                  setDeleteOpen(true);
+                                }
+                              }
+                            ]}
                           />
                         </div>
                       </td>

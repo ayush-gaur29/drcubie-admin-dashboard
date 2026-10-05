@@ -21,6 +21,7 @@ import Badge from '../ui/Badge';
 import Spinner from '../ui/Spinner';
 import EmptyState from '../ui/EmptyState';
 import Pagination from '../ui/Pagination';
+import ActionMenu from '../ui/ActionMenu';
 import usePagination from '../../hooks/usePagination';
 import { formatDate, formatCurrency } from '../../utils/formatters';
 
@@ -375,22 +376,22 @@ export const MembershipPlansSection = ({
                         </td>
 
                         {/* Actions */}
-                        <td>
+                        <td style={{ textAlign: 'right' }}>
                           <div className="table-actions" style={{ justifyContent: 'flex-end', gap: '0.25rem' }}>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              icon={Edit2}
-                              onClick={() => onEditPlan(plan)}
-                              title="Edit Plan"
-                            />
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              icon={Trash2}
-                              onClick={() => onDeletePlan(plan)}
-                              style={{ color: 'var(--danger)' }}
-                              title="Delete Plan"
+                            <ActionMenu
+                              items={[
+                                {
+                                  label: 'Edit Plan',
+                                  icon: Edit2,
+                                  onClick: () => onEditPlan(plan)
+                                },
+                                {
+                                  label: 'Delete Plan',
+                                  icon: Trash2,
+                                  danger: true,
+                                  onClick: () => onDeletePlan(plan)
+                                }
+                              ]}
                             />
                           </div>
                         </td>

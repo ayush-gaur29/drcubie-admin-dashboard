@@ -799,6 +799,97 @@ a:hover {
   gap: 0.4rem;
 }
 
+/* Table Action Menu (Three-dot popover) */
+.action-menu-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.btn-action-menu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.btn-action-menu:hover,
+.btn-action-menu.active {
+  background: var(--bg-muted);
+  border-color: var(--border-subtle);
+  color: var(--text-main);
+  box-shadow: var(--shadow-xs);
+}
+
+.action-menu-dropdown {
+  position: fixed;
+  z-index: 9999;
+  min-width: 148px;
+  max-width: 220px;
+  background: #ffffff;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.16), 0 4px 6px -2px rgba(15, 23, 42, 0.05);
+  padding: 0.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  animation: fadeIn 0.1s ease-out;
+  box-sizing: border-box;
+}
+
+.action-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-main);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-fast);
+  line-height: 1.3;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.action-menu-item:hover:not(:disabled) {
+  background: var(--bg-muted);
+  color: var(--primary);
+}
+
+.action-menu-item .action-menu-icon {
+  flex-shrink: 0;
+}
+
+.action-menu-item.danger {
+  color: var(--danger);
+}
+
+.action-menu-item.danger:hover:not(:disabled) {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+.action-menu-item:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 /* Badges */
 .badge {
   display: inline-flex;

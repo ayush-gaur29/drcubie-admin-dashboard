@@ -15,6 +15,7 @@ import Badge from '../../components/ui/Badge';
 import Spinner from '../../components/ui/Spinner';
 import EmptyState from '../../components/ui/EmptyState';
 import Pagination from '../../components/ui/Pagination';
+import ActionMenu from '../../components/ui/ActionMenu';
 import usePagination from '../../hooks/usePagination';
 import UserProfileModal from '../../components/users/UserProfileModal';
 import {
@@ -263,26 +264,23 @@ export const UsersPage = () => {
                           Active
                         </Badge>
                       </td>
-                      <td>
+                      <td style={{ textAlign: 'right' }}>
                         <div className="table-actions" style={{ justifyContent: 'flex-end', gap: '0.5rem' }}>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            icon={Eye}
-                            onClick={() => handleViewProfile(u)}
-                            title="View Profile Details"
-                          >
-                            View Profile
-                          </Button>
-                          <Button
-                            variant={u.is_vip ? 'secondary' : 'primary'}
-                            size="sm"
-                            icon={Crown}
-                            onClick={() => handleToggleVip(u)}
-                            title={u.is_vip ? 'Revoke VIP' : 'Grant VIP'}
-                          >
-                            {u.is_vip ? 'Revoke VIP' : 'Grant VIP'}
-                          </Button>
+                          <ActionMenu
+                            items={[
+                              {
+                                label: 'View Profile',
+                                icon: Eye,
+                                onClick: () => handleViewProfile(u)
+                              },
+                              {
+                                label: u.is_vip ? 'Revoke VIP' : 'Grant VIP',
+                                icon: Crown,
+                                danger: u.is_vip,
+                                onClick: () => handleToggleVip(u)
+                              }
+                            ]}
+                          />
                         </div>
                       </td>
                     </tr>

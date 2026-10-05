@@ -47,11 +47,11 @@ export const PaymentAnalyticsPage = () => {
         setAnalytics(data);
 
         if (isManualRefresh) {
-          showToast('success', 'Payment analytics synchronized with Supabase.');
+          showToast('success', 'Payment analytics synchronized.');
         }
       } catch (err) {
         console.error('[PaymentAnalyticsPage] Error loading payment analytics:', err);
-        showToast('error', 'Failed to synchronize payment analytics from Supabase.');
+        showToast('error', 'Failed to synchronize payment analytics.');
       } finally {
         setLoading(false);
         setRefreshing(false);
@@ -76,7 +76,7 @@ export const PaymentAnalyticsPage = () => {
   }, [loadData]);
 
   if (loading && !analytics) {
-    return <Spinner size={36} text="Loading live payment analytics from Supabase..." />;
+    return <Spinner size={36} text="Loading live payment analytics..." />;
   }
 
   const kpis = analytics?.kpis;

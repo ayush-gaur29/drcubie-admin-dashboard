@@ -2,14 +2,10 @@ import React, { useState } from 'react';
 import {
   CreditCard,
   User,
-  Calendar,
   CheckCircle2,
   AlertCircle,
   Copy,
   Check,
-  Crown,
-  ShieldCheck,
-  ExternalLink,
   Layers
 } from 'lucide-react';
 import Modal from '../ui/Modal';
@@ -129,22 +125,6 @@ export const PaymentDetailModal = ({ isOpen, onClose, payment }) => {
               <span className="detail-label">Email</span>
               <span className="detail-value">{payment.customer_email || '—'}</span>
             </div>
-            <div className="detail-item">
-              <span className="detail-label">User ID (Supabase)</span>
-              <code className="detail-code-sm">{payment.user_id || '—'}</code>
-            </div>
-            <div className="detail-item">
-              <span className="detail-label">VIP Entitlement</span>
-              <div style={{ marginTop: '0.2rem' }}>
-                {payment.is_vip ? (
-                  <Badge variant="vip" icon={Crown}>
-                    VIP ACTIVE
-                  </Badge>
-                ) : (
-                  <Badge variant="muted">Standard User</Badge>
-                )}
-              </div>
-            </div>
           </div>
         </div>
 
@@ -152,7 +132,7 @@ export const PaymentDetailModal = ({ isOpen, onClose, payment }) => {
         <div className="detail-section-block">
           <div className="detail-section-header">
             <Layers size={15} color="var(--accent-vip)" />
-            <span>Plan & Entitlement Details</span>
+            <span>Membership & Plan Details</span>
           </div>
           <div className="detail-grid-two">
             <div className="detail-item">
@@ -178,34 +158,22 @@ export const PaymentDetailModal = ({ isOpen, onClose, payment }) => {
           </div>
         </div>
 
-        {/* Gateway & Security Details */}
+        {/* Gateway & Payment Details */}
         <div className="detail-section-block">
           <div className="detail-section-header">
-            <ShieldCheck size={15} color="var(--success)" />
-            <span>Gateway & Verification</span>
+            <CreditCard size={15} color="var(--primary)" />
+            <span>Payment & Gateway</span>
           </div>
           <div className="detail-grid-two">
             <div className="detail-item">
               <span className="detail-label">Payment Gateway</span>
               <span className="detail-value">
-                {payment.payment_id?.startsWith('pi_') || payment.payment_id?.startsWith('cs_')
-                  ? 'Stripe Payment Gateway'
-                  : 'Stripe / Supabase'}
+                {payment.gateway || 'Stripe'}
               </span>
             </div>
             <div className="detail-item">
-              <span className="detail-label">Recorded At</span>
+              <span className="detail-label">Payment Date</span>
               <span className="detail-value">{formattedDateTime}</span>
-            </div>
-            <div className="detail-item">
-              <span className="detail-label">Authoritative Source</span>
-              <span className="detail-value">public.memberships (Verified)</span>
-            </div>
-            <div className="detail-item">
-              <span className="detail-label">Membership Status</span>
-              <span className="detail-value" style={{ textTransform: 'capitalize' }}>
-                {payment.status || 'Active'}
-              </span>
             </div>
           </div>
         </div>

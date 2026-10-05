@@ -21,6 +21,7 @@ import EmptyState from '../../components/ui/EmptyState';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import Modal from '../../components/ui/Modal';
 import Pagination from '../../components/ui/Pagination';
+import ActionMenu from '../../components/ui/ActionMenu';
 import usePagination from '../../hooks/usePagination';
 import {
   fetchAdminRecommendations,
@@ -422,25 +423,25 @@ export const RecommendationsPage = () => {
                       <td style={{ fontSize: '0.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
                         {formatDate(rec.created_at)}
                       </td>
-                      <td>
+                      <td style={{ textAlign: 'right' }}>
                         <div className="table-actions" style={{ justifyContent: 'flex-end' }}>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            icon={Edit2}
-                            onClick={() => handleOpenEdit(rec)}
-                            title="Edit"
-                          />
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            icon={Trash2}
-                            onClick={() => {
-                              setItemToDelete(rec);
-                              setDeleteOpen(true);
-                            }}
-                            style={{ color: 'var(--danger)' }}
-                            title="Delete"
+                          <ActionMenu
+                            items={[
+                              {
+                                label: 'Edit',
+                                icon: Edit2,
+                                onClick: () => handleOpenEdit(rec)
+                              },
+                              {
+                                label: 'Delete',
+                                icon: Trash2,
+                                danger: true,
+                                onClick: () => {
+                                  setItemToDelete(rec);
+                                  setDeleteOpen(true);
+                                }
+                              }
+                            ]}
                           />
                         </div>
                       </td>

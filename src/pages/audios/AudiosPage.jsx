@@ -25,6 +25,7 @@ import EmptyState from '../../components/ui/EmptyState';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import Modal from '../../components/ui/Modal';
 import Pagination from '../../components/ui/Pagination';
+import ActionMenu from '../../components/ui/ActionMenu';
 import usePagination from '../../hooks/usePagination';
 import MediaPreviewModal from '../../components/content/MediaPreviewModal';
 import {
@@ -525,29 +526,27 @@ export const AudiosPage = () => {
                     <td style={{ fontSize: '0.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
                       {formatDate(a.created_at)}
                     </td>
-                    <td>
+                    <td style={{ textAlign: 'right' }}>
                       <div className="table-actions" style={{ justifyContent: 'flex-end' }}>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          icon={Eye}
-                          onClick={() => handleOpenPreview(a)}
-                          title="Preview Audio"
-                        />
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          icon={Edit2}
-                          onClick={() => handleOpenEdit(a)}
-                          title="Edit Audio"
-                        />
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          icon={Trash2}
-                          onClick={() => handleOpenDelete(a)}
-                          style={{ color: 'var(--danger)' }}
-                          title="Delete Audio"
+                        <ActionMenu
+                          items={[
+                            {
+                              label: 'View',
+                              icon: Eye,
+                              onClick: () => handleOpenPreview(a)
+                            },
+                            {
+                              label: 'Edit',
+                              icon: Edit2,
+                              onClick: () => handleOpenEdit(a)
+                            },
+                            {
+                              label: 'Delete',
+                              icon: Trash2,
+                              danger: true,
+                              onClick: () => handleOpenDelete(a)
+                            }
+                          ]}
                         />
                       </div>
                     </td>

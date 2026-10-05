@@ -14,7 +14,7 @@ export const PlanRevenueChart = ({ planRevenue = [] }) => {
             <h3 className="card-title">Revenue by Membership Plan</h3>
           </div>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-            Real plan revenue & volume dynamically queried from Supabase
+            Real plan revenue & volume dynamically tracked
           </p>
         </div>
       </div>

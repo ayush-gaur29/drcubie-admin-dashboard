@@ -23,6 +23,7 @@ import Spinner from '../../components/ui/Spinner';
 import EmptyState from '../../components/ui/EmptyState';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import Pagination from '../../components/ui/Pagination';
+import ActionMenu from '../../components/ui/ActionMenu';
 import usePagination from '../../hooks/usePagination';
 import SparkFormModal from '../../components/content/SparkFormModal';
 import MediaPreviewModal from '../../components/content/MediaPreviewModal';
@@ -411,29 +412,27 @@ export const SparksPage = () => {
                     <td style={{ fontSize: '0.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
                       {formatDate(spark.created_at)}
                     </td>
-                    <td>
+                    <td style={{ textAlign: 'right' }}>
                       <div className="table-actions" style={{ justifyContent: 'flex-end' }}>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          icon={Eye}
-                          onClick={() => handleOpenPreview(spark)}
-                          title="Preview Spark"
-                        />
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          icon={Edit2}
-                          onClick={() => handleOpenEdit(spark)}
-                          title="Edit Spark"
-                        />
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          icon={Trash2}
-                          onClick={() => handleOpenDelete(spark)}
-                          style={{ color: 'var(--danger)' }}
-                          title="Delete Spark"
+                        <ActionMenu
+                          items={[
+                            {
+                              label: 'View',
+                              icon: Eye,
+                              onClick: () => handleOpenPreview(spark)
+                            },
+                            {
+                              label: 'Edit',
+                              icon: Edit2,
+                              onClick: () => handleOpenEdit(spark)
+                            },
+                            {
+                              label: 'Delete',
+                              icon: Trash2,
+                              danger: true,
+                              onClick: () => handleOpenDelete(spark)
+                            }
+                          ]}
                         />
                       </div>
                     </td>

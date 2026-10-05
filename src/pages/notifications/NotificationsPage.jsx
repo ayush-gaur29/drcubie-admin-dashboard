@@ -24,6 +24,7 @@ import EmptyState from '../../components/ui/EmptyState';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import Modal from '../../components/ui/Modal';
 import Pagination from '../../components/ui/Pagination';
+import ActionMenu from '../../components/ui/ActionMenu';
 import usePagination from '../../hooks/usePagination';
 import {
   fetchAdminNotifications,
@@ -337,17 +338,20 @@ export const NotificationsPage = () => {
                     <td style={{ fontSize: '0.78rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
                       {formatDate(n.created_at)}
                     </td>
-                    <td>
+                    <td style={{ textAlign: 'right' }}>
                       <div className="table-actions" style={{ justifyContent: 'flex-end' }}>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          icon={Trash2}
-                          onClick={() => {
-                            setItemToDelete(n);
-                            setDeleteOpen(true);
-                          }}
-                          title="Delete notification"
+                        <ActionMenu
+                          items={[
+                            {
+                              label: 'Delete',
+                              icon: Trash2,
+                              danger: true,
+                              onClick: () => {
+                                setItemToDelete(n);
+                                setDeleteOpen(true);
+                              }
+                            }
+                          ]}
                         />
                       </div>
                     </td>

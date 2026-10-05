@@ -30,6 +30,7 @@ import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import Modal from '../../components/ui/Modal';
 import MediaPreviewModal from '../../components/content/MediaPreviewModal';
 import Pagination from '../../components/ui/Pagination';
+import ActionMenu from '../../components/ui/ActionMenu';
 import usePagination from '../../hooks/usePagination';
 import {
   fetchVipKpis,
@@ -772,28 +773,26 @@ export const VipPassPage = () => {
                           {formatDate(item.created_at)}
                         </td>
 
-                        <td>
+                        <td style={{ textAlign: 'right' }}>
                           <div className="table-actions" style={{ justifyContent: 'flex-end' }}>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              icon={Eye}
-                              onClick={() => {
-                                setPreviewItem(item);
-                                setPreviewOpen(true);
-                              }}
-                              title="Preview Content"
+                            <ActionMenu
+                              items={[
+                                {
+                                  label: 'View Preview',
+                                  icon: Eye,
+                                  onClick: () => {
+                                    setPreviewItem(item);
+                                    setPreviewOpen(true);
+                                  }
+                                },
+                                {
+                                  label: item.is_vip ? 'Make Public' : 'Make VIP',
+                                  icon: Crown,
+                                  danger: item.is_vip,
+                                  onClick: () => handleToggleContentVip(item)
+                                }
+                              ]}
                             />
-
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleToggleContentVip(item)}
-                              title={item.is_vip ? 'Make Public' : 'Make VIP'}
-                              style={{ color: item.is_vip ? 'var(--text-muted)' : 'var(--accent-vip)' }}
-                            >
-                              {item.is_vip ? 'Make Public' : 'Make VIP'}
-                            </Button>
                           </div>
                         </td>
                       </tr>
@@ -995,18 +994,18 @@ export const VipPassPage = () => {
                         {formatDate(member.created_at)}
                       </td>
 
-                      <td>
+                      <td style={{ textAlign: 'right' }}>
                         <div className="table-actions" style={{ justifyContent: 'flex-end' }}>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            icon={UserX}
-                            onClick={() => handleRevokeVip(member)}
-                            style={{ color: 'var(--danger)' }}
-                            title="Revoke VIP Access"
-                          >
-                            Revoke VIP
-                          </Button>
+                          <ActionMenu
+                            items={[
+                              {
+                                label: 'Revoke VIP',
+                                icon: UserX,
+                                danger: true,
+                                onClick: () => handleRevokeVip(member)
+                              }
+                            ]}
+                          />
                         </div>
                       </td>
                     </tr>

@@ -22,6 +22,7 @@ import EmptyState from '../../components/ui/EmptyState';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import Modal from '../../components/ui/Modal';
 import Pagination from '../../components/ui/Pagination';
+import ActionMenu from '../../components/ui/ActionMenu';
 import usePagination from '../../hooks/usePagination';
 import MediaPreviewModal from '../../components/content/MediaPreviewModal';
 import {
@@ -466,29 +467,27 @@ export const VideosPage = () => {
                     <td style={{ fontSize: '0.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
                       {formatDate(v.created_at)}
                     </td>
-                    <td>
+                    <td style={{ textAlign: 'right' }}>
                       <div className="table-actions" style={{ justifyContent: 'flex-end' }}>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          icon={Eye}
-                          onClick={() => handleOpenPreview(v)}
-                          title="Preview Video"
-                        />
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          icon={Edit2}
-                          onClick={() => handleOpenEdit(v)}
-                          title="Edit Video"
-                        />
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          icon={Trash2}
-                          onClick={() => handleOpenDelete(v)}
-                          style={{ color: 'var(--danger)' }}
-                          title="Delete Video"
+                        <ActionMenu
+                          items={[
+                            {
+                              label: 'View',
+                              icon: Eye,
+                              onClick: () => handleOpenPreview(v)
+                            },
+                            {
+                              label: 'Edit',
+                              icon: Edit2,
+                              onClick: () => handleOpenEdit(v)
+                            },
+                            {
+                              label: 'Delete',
+                              icon: Trash2,
+                              danger: true,
+                              onClick: () => handleOpenDelete(v)
+                            }
+                          ]}
                         />
                       </div>
                     </td>

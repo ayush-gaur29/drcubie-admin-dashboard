@@ -6,8 +6,6 @@ import {
   ArrowUp,
   ArrowDown,
   Eye,
-  Copy,
-  Check,
   CheckCircle2,
   AlertCircle,
   Clock,
@@ -21,6 +19,7 @@ import Input from '../ui/Input';
 import Select from '../ui/Select';
 import EmptyState from '../ui/EmptyState';
 import Pagination from '../ui/Pagination';
+import ActionMenu from '../ui/ActionMenu';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 
 export const RecentPaymentsTable = ({
@@ -40,16 +39,6 @@ export const RecentPaymentsTable = ({
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-
-  // Copied ID state
-  const [copiedId, setCopiedId] = useState(null);
-
-  const handleCopy = (id, e) => {
-    e.stopPropagation();
-    navigator.clipboard?.writeText(id);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
-  };
 
   // Status options
   const statusOptions = [
@@ -217,7 +206,7 @@ export const RecentPaymentsTable = ({
             <h3 className="card-title">Recent Payments</h3>
           </div>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-            Authoritative transactional logs from Stripe payments and Supabase memberships
+            Transactional logs from Stripe payments and memberships
           </p>
         </div>
 
@@ -309,19 +298,11 @@ export const RecentPaymentsTable = ({
                       Payment Date {renderSortIndicator('created_at')}
                     </div>
                   </th>
-                  <th>Payment ID</th>
                   <th style={{ textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {paginatedPayments.map((p) => {
-                  const isCopied = copiedId === p.payment_id;
-                  const truncatedId = p.payment_id
-                    ? p.payment_id.length > 18
-                      ? `${p.payment_id.slice(0, 10)}...${p.payment_id.slice(-6)}`
-                      : p.payment_id
-                    : '—';
-
                   return (
                     <tr
                       key={p.id}
@@ -388,39 +369,16 @@ export const RecentPaymentsTable = ({
                         {formatDate(p.created_at)}
                       </td>
 
-                      {/* Payment ID with copy */}
-                      <td>
-                        <div
-                          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-                          onClick={(e) => handleCopy(p.payment_id, e)}
-                          title="Click to copy full ID"
-                        >
-                          <code className="detail-meta-code-table">{truncatedId}</code>
-                          <button
-                            type="button"
-                            className="btn-ghost-icon-sm"
-                            aria-label="Copy ID"
-                          >
-                            {isCopied ? (
-                              <Check size={12} color="var(--success)" />
-                            ) : (
-                              <Copy size={12} color="var(--text-faint)" />
-                            )}
-                          </button>
-                        </div>
-                      </td>
-
                       {/* Actions */}
                       <td style={{ textAlign: 'right' }}>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          icon={Eye}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onSelectPayment(p);
-                          }}
-                          title="View Payment Details"
+                        <ActionMenu
+                          items={[
+                            {
+                              label: 'View Details',
+                              icon: Eye,
+                              onClick: () => onSelectPayment(p)
+                            }
+                          ]}
                         />
                       </td>
                     </tr>
@@ -466,9 +424,6 @@ export const RecentPaymentsTable = ({
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-faint)' }}>
                     {formatDate(p.created_at)}
                   </span>
-                  <code style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                    {p.payment_id?.slice(0, 14)}...
-                  </code>
                 </div>
               </div>
             ))}
