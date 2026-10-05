@@ -22,6 +22,8 @@ import Badge from '../../components/ui/Badge';
 import Spinner from '../../components/ui/Spinner';
 import EmptyState from '../../components/ui/EmptyState';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
+import Pagination from '../../components/ui/Pagination';
+import usePagination from '../../hooks/usePagination';
 import SparkFormModal from '../../components/content/SparkFormModal';
 import MediaPreviewModal from '../../components/content/MediaPreviewModal';
 import {
@@ -81,6 +83,15 @@ export const SparksPage = () => {
 
   const { showToast } = useToast();
 
+  const {
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    pageSize,
+    totalItems,
+    paginatedItems: paginatedSparks
+  } = usePagination(sparks, 10, [search, category, status, isVip]);
+
   const loadSparks = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
     else setLoading(true);
@@ -90,7 +101,8 @@ export const SparksPage = () => {
         search,
         category,
         status,
-        isVip
+        isVip,
+        limit: 500
       });
       setSparks(data || []);
       if (isRefresh) {
@@ -268,9 +280,9 @@ export const SparksPage = () => {
           />
         </div>
       ) : (
-        <>
+        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
           {/* Desktop Table View */}
-          <div className="table-container sparks-desktop-table">
+          <div className="table-container sparks-desktop-table" style={{ border: 'none', boxShadow: 'none' }}>
             <table className="admin-table">
               <thead>
                 <tr>
@@ -286,7 +298,7 @@ export const SparksPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {sparks.map((spark) => (
+                {paginatedSparks.map((spark) => (
                   <tr key={spark.id}>
                     <td>
                       {spark.thumbnail_url ? (
@@ -432,8 +444,8 @@ export const SparksPage = () => {
           </div>
 
           {/* Mobile Card List View (Fluid on 320px - 768px viewports) */}
-          <div className="sparks-mobile-cards">
-            {sparks.map((spark) => (
+          <div className="sparks-mobile-cards" style={{ padding: '0.85rem' }}>
+            {paginatedSparks.map((spark) => (
               <div key={spark.id} className="spark-mobile-card">
                 <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
                   {spark.thumbnail_url ? (
@@ -562,7 +574,16 @@ export const SparksPage = () => {
               </div>
             ))}
           </div>
-        </>
+
+          {/* Pagination Controls */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            pageSize={pageSize}
+            onPageChange={setCurrentPage}
+          />
+        </div>
       )}
 
       {/* Spark Create / Edit Modal */}

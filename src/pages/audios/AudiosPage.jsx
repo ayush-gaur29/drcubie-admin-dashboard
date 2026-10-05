@@ -24,6 +24,8 @@ import Spinner from '../../components/ui/Spinner';
 import EmptyState from '../../components/ui/EmptyState';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import Modal from '../../components/ui/Modal';
+import Pagination from '../../components/ui/Pagination';
+import usePagination from '../../hooks/usePagination';
 import MediaPreviewModal from '../../components/content/MediaPreviewModal';
 import {
   fetchAdminAudios,
@@ -102,6 +104,15 @@ export const AudiosPage = () => {
 
   const { showToast } = useToast();
 
+  const {
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    pageSize,
+    totalItems,
+    paginatedItems: paginatedAudios
+  } = usePagination(audios, 10, [search, category, status, isVip]);
+
   const loadAudios = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
     else setLoading(true);
@@ -111,7 +122,8 @@ export const AudiosPage = () => {
         search,
         category,
         status,
-        isVip
+        isVip,
+        limit: 500
       });
       setAudios(data || []);
       if (isRefresh) {
@@ -423,9 +435,9 @@ export const AudiosPage = () => {
           />
         </div>
       ) : (
-        <>
+        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
           {/* Desktop Table View */}
-          <div className="table-container audios-desktop-table">
+          <div className="table-container audios-desktop-table" style={{ border: 'none', boxShadow: 'none' }}>
             <table className="admin-table">
               <thead>
                 <tr>
@@ -440,7 +452,7 @@ export const AudiosPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {audios.map((a) => (
+                {paginatedAudios.map((a) => (
                   <tr key={a.id}>
                     <td>
                       {a.thumbnail_url ? (
@@ -546,8 +558,8 @@ export const AudiosPage = () => {
           </div>
 
           {/* Responsive Mobile Cards View */}
-          <div className="audios-mobile-cards">
-            {audios.map((a) => (
+          <div className="audios-mobile-cards" style={{ padding: '0.85rem' }}>
+            {paginatedAudios.map((a) => (
               <div key={`m-aud-${a.id}`} className="admin-mobile-card">
                 <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start', marginBottom: '0.65rem' }}>
                   {a.thumbnail_url ? (
@@ -674,7 +686,16 @@ export const AudiosPage = () => {
               </div>
             ))}
           </div>
-        </>
+
+          {/* Pagination Controls */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            pageSize={pageSize}
+            onPageChange={setCurrentPage}
+          />
+        </div>
       )}
 
       {/* Audio Modal */}

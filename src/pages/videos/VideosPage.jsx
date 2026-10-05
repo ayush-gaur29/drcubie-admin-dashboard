@@ -21,6 +21,8 @@ import Spinner from '../../components/ui/Spinner';
 import EmptyState from '../../components/ui/EmptyState';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import Modal from '../../components/ui/Modal';
+import Pagination from '../../components/ui/Pagination';
+import usePagination from '../../hooks/usePagination';
 import MediaPreviewModal from '../../components/content/MediaPreviewModal';
 import {
   fetchAdminVideos,
@@ -95,6 +97,15 @@ export const VideosPage = () => {
 
   const { showToast } = useToast();
 
+  const {
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    pageSize,
+    totalItems,
+    paginatedItems: paginatedVideos
+  } = usePagination(videos, 10, [search, category, status, isVip]);
+
   const loadVideos = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
     else setLoading(true);
@@ -104,7 +115,8 @@ export const VideosPage = () => {
         search,
         category,
         status,
-        isVip
+        isVip,
+        limit: 500
       });
       setVideos(data || []);
       if (isRefresh) {
@@ -348,9 +360,9 @@ export const VideosPage = () => {
           />
         </div>
       ) : (
-        <>
+        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
           {/* Desktop Table View */}
-          <div className="table-container videos-desktop-table">
+          <div className="table-container videos-desktop-table" style={{ border: 'none', boxShadow: 'none' }}>
             <table className="admin-table">
               <thead>
                 <tr>
@@ -365,7 +377,7 @@ export const VideosPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {videos.map((v) => (
+                {paginatedVideos.map((v) => (
                   <tr key={v.id}>
                     <td>
                       {v.thumbnail_url ? (
@@ -487,8 +499,8 @@ export const VideosPage = () => {
           </div>
 
           {/* Responsive Mobile Cards View */}
-          <div className="videos-mobile-cards">
-            {videos.map((v) => (
+          <div className="videos-mobile-cards" style={{ padding: '0.85rem' }}>
+            {paginatedVideos.map((v) => (
               <div key={`m-vid-${v.id}`} className="admin-mobile-card">
                 <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start', marginBottom: '0.65rem' }}>
                   {v.thumbnail_url ? (
@@ -626,7 +638,16 @@ export const VideosPage = () => {
               </div>
             ))}
           </div>
-        </>
+
+          {/* Pagination Controls */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            pageSize={pageSize}
+            onPageChange={setCurrentPage}
+          />
+        </div>
       )}
 
       {/* Video Modal */}

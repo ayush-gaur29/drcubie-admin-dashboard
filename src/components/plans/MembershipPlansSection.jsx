@@ -20,6 +20,8 @@ import Button from '../ui/Button';
 import Badge from '../ui/Badge';
 import Spinner from '../ui/Spinner';
 import EmptyState from '../ui/EmptyState';
+import Pagination from '../ui/Pagination';
+import usePagination from '../../hooks/usePagination';
 import { formatDate, formatCurrency } from '../../utils/formatters';
 
 const MIGRATION_SQL = `-- Run this in your Supabase SQL Editor:
@@ -84,6 +86,13 @@ export const MembershipPlansSection = ({
   const [expandedPlanId, setExpandedPlanId] = useState(null);
   const [showSql, setShowSql] = useState(false);
   const [copiedSql, setCopiedSql] = useState(false);
+
+  const {
+    currentPage,
+    totalPages,
+    paginatedItems: paginatedPlans,
+    goToPage
+  } = usePagination(plans, 10, [plans]);
 
   const handleCopySql = () => {
     navigator.clipboard.writeText(MIGRATION_SQL);
@@ -212,7 +221,7 @@ export const MembershipPlansSection = ({
                 </tr>
               </thead>
               <tbody>
-                {plans.map((plan) => {
+                {paginatedPlans.map((plan) => {
                   const features = Array.isArray(plan.features) ? plan.features : [];
                   const isExpanded = expandedPlanId === plan.id;
 
@@ -427,7 +436,7 @@ export const MembershipPlansSection = ({
 
           {/* Mobile Cards for Plans */}
           <div className="recommendations-mobile-cards" style={{ padding: '0.5rem 0' }}>
-            {plans.map((plan) => {
+            {paginatedPlans.map((plan) => {
               const features = Array.isArray(plan.features) ? plan.features : [];
 
               return (
@@ -547,6 +556,14 @@ export const MembershipPlansSection = ({
               );
             })}
           </div>
+
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={plans.length}
+            pageSize={10}
+            onPageChange={goToPage}
+          />
         </>
       )}
     </div>

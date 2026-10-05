@@ -23,6 +23,8 @@ import Spinner from '../../components/ui/Spinner';
 import EmptyState from '../../components/ui/EmptyState';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import Modal from '../../components/ui/Modal';
+import Pagination from '../../components/ui/Pagination';
+import usePagination from '../../hooks/usePagination';
 import {
   fetchAdminNotifications,
   sendNotification,
@@ -90,6 +92,13 @@ export const NotificationsPage = () => {
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const { showToast } = useToast();
+
+  const {
+    currentPage,
+    totalPages,
+    paginatedItems: paginatedNotifications,
+    goToPage
+  } = usePagination(notifications, 10, [notifications]);
 
   const loadNotifications = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
@@ -277,8 +286,8 @@ export const NotificationsPage = () => {
           />
         </div>
       ) : (
-        <>
-          <div className="table-container notifications-desktop-table">
+        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+          <div className="table-container notifications-desktop-table" style={{ border: 'none', boxShadow: 'none' }}>
             <table className="admin-table">
               <thead>
                 <tr>
@@ -292,7 +301,7 @@ export const NotificationsPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {notifications.map((n) => (
+                {paginatedNotifications.map((n) => (
                   <tr key={n.id}>
                     <td>
                       <div>
@@ -349,8 +358,8 @@ export const NotificationsPage = () => {
           </div>
 
           {/* Mobile Cards for Tablet / Mobile (<= 768px) */}
-          <div className="notifications-mobile-cards">
-            {notifications.map((n) => (
+          <div className="notifications-mobile-cards" style={{ padding: '0.85rem' }}>
+            {paginatedNotifications.map((n) => (
               <div key={`m-notif-${n.id}`} className="admin-mobile-card notif-mobile-card">
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.45rem', flexWrap: 'wrap', gap: '0.35rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
@@ -401,7 +410,15 @@ export const NotificationsPage = () => {
               </div>
             ))}
           </div>
-        </>
+
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={notifications.length}
+            pageSize={10}
+            onPageChange={goToPage}
+          />
+        </div>
       )}
 
       {/* Compose Notification Modal */}

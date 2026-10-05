@@ -2,9 +2,20 @@ import React from 'react';
 import { Sparkles, Video, Headphones, Eye, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Badge from '../ui/Badge';
+import Pagination from '../ui/Pagination';
+import usePagination from '../../hooks/usePagination';
 import { formatDate } from '../../utils/formatters';
 
 export const RecentContentTable = ({ items = [] }) => {
+  const {
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    pageSize,
+    totalItems,
+    paginatedItems
+  } = usePagination(items, 10);
+
   if (items.length === 0) {
     return (
       <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
@@ -14,8 +25,8 @@ export const RecentContentTable = ({ items = [] }) => {
   }
 
   return (
-    <>
-      <div className="table-container recent-desktop-table">
+    <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+      <div className="table-container recent-desktop-table" style={{ border: 'none', boxShadow: 'none' }}>
         <table className="admin-table">
           <thead>
             <tr>
@@ -29,7 +40,7 @@ export const RecentContentTable = ({ items = [] }) => {
             </tr>
           </thead>
           <tbody>
-            {items.map((item) => {
+            {paginatedItems.map((item) => {
               let TypeIcon = Sparkles;
               let typeLabel = 'Spark';
               let linkTarget = '/sparks';
@@ -94,8 +105,8 @@ export const RecentContentTable = ({ items = [] }) => {
       </div>
 
       {/* Mobile Cards View */}
-      <div className="recent-mobile-cards">
-        {items.map((item) => {
+      <div className="recent-mobile-cards" style={{ padding: '0.85rem' }}>
+        {paginatedItems.map((item) => {
           let TypeIcon = Sparkles;
           let typeLabel = 'Spark';
           let linkTarget = '/sparks';
@@ -147,7 +158,16 @@ export const RecentContentTable = ({ items = [] }) => {
           );
         })}
       </div>
-    </>
+
+      {/* Pagination Controls */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        pageSize={pageSize}
+        onPageChange={setCurrentPage}
+      />
+    </div>
   );
 };
 

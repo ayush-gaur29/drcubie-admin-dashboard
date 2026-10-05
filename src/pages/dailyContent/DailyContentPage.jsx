@@ -23,6 +23,8 @@ import Spinner from '../../components/ui/Spinner';
 import EmptyState from '../../components/ui/EmptyState';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import Modal from '../../components/ui/Modal';
+import Pagination from '../../components/ui/Pagination';
+import usePagination from '../../hooks/usePagination';
 import {
   fetchDailyContentList,
   saveDailyContent,
@@ -62,6 +64,15 @@ export const DailyContentPage = () => {
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const { showToast } = useToast();
+
+  const {
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    pageSize,
+    totalItems,
+    paginatedItems: paginatedSchedule
+  } = usePagination(scheduleList, 10);
 
   const loadData = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
@@ -303,8 +314,8 @@ export const DailyContentPage = () => {
           />
         </div>
       ) : (
-        <>
-          <div className="table-container daily-desktop-table">
+        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+          <div className="table-container daily-desktop-table" style={{ border: 'none', boxShadow: 'none' }}>
             <table className="admin-table">
               <thead>
                 <tr>
@@ -319,7 +330,7 @@ export const DailyContentPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {scheduleList.map((entry) => {
+                {paginatedSchedule.map((entry) => {
                   const isToday = entry.content_date === todayStr;
                   const videoTitle = entry.sparks?.videos?.title;
                   const audioTitle = entry.sparks?.audios?.title;
@@ -404,8 +415,8 @@ export const DailyContentPage = () => {
           </div>
 
           {/* Mobile Cards for Tablet / Mobile (<= 768px) */}
-          <div className="daily-mobile-cards">
-            {scheduleList.map((entry) => {
+          <div className="daily-mobile-cards" style={{ padding: '0.85rem' }}>
+            {paginatedSchedule.map((entry) => {
               const isToday = entry.content_date === todayStr;
               const videoTitle = entry.sparks?.videos?.title;
               const audioTitle = entry.sparks?.audios?.title;
@@ -497,7 +508,16 @@ export const DailyContentPage = () => {
               );
             })}
           </div>
-        </>
+
+          {/* Pagination Controls */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            pageSize={pageSize}
+            onPageChange={setCurrentPage}
+          />
+        </div>
       )}
 
       {/* Programming Modal */}

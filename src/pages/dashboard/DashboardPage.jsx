@@ -36,7 +36,7 @@ export const DashboardPage = () => {
     try {
       const [kpiData, recentData] = await Promise.all([
         fetchDashboardKpis(),
-        fetchRecentContent(8)
+        fetchRecentContent(50)
       ]);
       setKpis(kpiData);
       setRecentItems(recentData);

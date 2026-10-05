@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Search,
   SlidersHorizontal,
@@ -20,6 +20,7 @@ import Button from '../ui/Button';
 import Input from '../ui/Input';
 import Select from '../ui/Select';
 import EmptyState from '../ui/EmptyState';
+import Pagination from '../ui/Pagination';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 
 export const RecentPaymentsTable = ({
@@ -126,6 +127,13 @@ export const RecentPaymentsTable = ({
 
   // Pagination calculation
   const totalPages = Math.max(1, Math.ceil(filteredPayments.length / pageSize));
+
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages);
+    }
+  }, [totalPages, currentPage]);
+
   const paginatedPayments = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
     return filteredPayments.slice(start, start + pageSize);
@@ -467,37 +475,13 @@ export const RecentPaymentsTable = ({
           </div>
 
           {/* Pagination Controls */}
-          <div className="payment-table-pagination">
-            <div className="pagination-info">
-              Showing {(currentPage - 1) * pageSize + 1} to{' '}
-              {Math.min(currentPage * pageSize, filteredPayments.length)} of{' '}
-              {filteredPayments.length} entries
-            </div>
-
-            <div className="pagination-controls">
-              <button
-                type="button"
-                className="btn-page"
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-              >
-                Previous
-              </button>
-
-              <span className="pagination-page-indicator">
-                Page {currentPage} of {totalPages}
-              </span>
-
-              <button
-                type="button"
-                className="btn-page"
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </button>
-            </div>
-          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={filteredPayments.length}
+            pageSize={pageSize}
+            onPageChange={setCurrentPage}
+          />
         </>
       )}
     </div>

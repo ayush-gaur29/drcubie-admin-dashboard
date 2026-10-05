@@ -20,6 +20,8 @@ import Spinner from '../../components/ui/Spinner';
 import EmptyState from '../../components/ui/EmptyState';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import Modal from '../../components/ui/Modal';
+import Pagination from '../../components/ui/Pagination';
+import usePagination from '../../hooks/usePagination';
 import {
   fetchAdminRecommendations,
   fetchRecommendationCandidates,
@@ -66,6 +68,15 @@ export const RecommendationsPage = () => {
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const { showToast } = useToast();
+
+  const {
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    pageSize,
+    totalItems,
+    paginatedItems: paginatedRecommendations
+  } = usePagination(recommendations, 10);
 
   const loadData = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
@@ -319,9 +330,9 @@ export const RecommendationsPage = () => {
           />
         </div>
       ) : (
-        <>
+        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
           {/* Desktop Table View */}
-          <div className="table-container recommendations-desktop-table">
+          <div className="table-container recommendations-desktop-table" style={{ border: 'none', boxShadow: 'none' }}>
             <table className="admin-table">
               <thead>
                 <tr>
@@ -336,7 +347,7 @@ export const RecommendationsPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {recommendations.map((rec) => {
+                {paginatedRecommendations.map((rec) => {
                   let TypeIcon = Sparkles;
                   if (rec.content_type === 'video') {
                     TypeIcon = Video;
@@ -441,8 +452,8 @@ export const RecommendationsPage = () => {
           </div>
 
           {/* Responsive Mobile Cards */}
-          <div className="recommendations-mobile-cards">
-            {recommendations.map((rec) => {
+          <div className="recommendations-mobile-cards" style={{ padding: '0.85rem' }}>
+            {paginatedRecommendations.map((rec) => {
               let TypeIcon = Sparkles;
               if (rec.content_type === 'video') TypeIcon = Video;
               else if (rec.content_type === 'audio') TypeIcon = Headphones;
@@ -516,7 +527,16 @@ export const RecommendationsPage = () => {
               );
             })}
           </div>
-        </>
+
+          {/* Pagination Controls */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            pageSize={pageSize}
+            onPageChange={setCurrentPage}
+          />
+        </div>
       )}
 
       {/* Modal */}

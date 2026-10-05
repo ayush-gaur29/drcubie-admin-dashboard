@@ -14,6 +14,8 @@ import Select from '../../components/ui/Select';
 import Badge from '../../components/ui/Badge';
 import Spinner from '../../components/ui/Spinner';
 import EmptyState from '../../components/ui/EmptyState';
+import Pagination from '../../components/ui/Pagination';
+import usePagination from '../../hooks/usePagination';
 import UserProfileModal from '../../components/users/UserProfileModal';
 import {
   fetchAdminUsers,
@@ -49,6 +51,15 @@ export const UsersPage = () => {
 
   const { showToast } = useToast();
 
+  const {
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    pageSize,
+    totalItems,
+    paginatedItems: paginatedUsers
+  } = usePagination(users, 10, [search, role, isVip]);
+
   const loadUsers = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
     else setLoading(true);
@@ -57,7 +68,8 @@ export const UsersPage = () => {
       const data = await fetchAdminUsers({
         search,
         role,
-        isVip
+        isVip,
+        limit: 500
       });
       setUsers(data || []);
       if (isRefresh) {
@@ -183,8 +195,8 @@ export const UsersPage = () => {
           />
         </div>
       ) : (
-        <>
-          <div className="table-container users-desktop-table">
+        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+          <div className="table-container users-desktop-table" style={{ border: 'none', boxShadow: 'none' }}>
             <table className="admin-table">
               <thead>
                 <tr>
@@ -199,7 +211,7 @@ export const UsersPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {users.map((u) => {
+                {paginatedUsers.map((u) => {
                   const displayName = u.full_name || 'Anonymous Member';
                   const initial = displayName.charAt(0).toUpperCase();
 
@@ -281,8 +293,8 @@ export const UsersPage = () => {
           </div>
 
           {/* Mobile Cards View (<= 768px) */}
-          <div className="users-mobile-cards">
-            {users.map((u) => {
+          <div className="users-mobile-cards" style={{ padding: '0.85rem' }}>
+            {paginatedUsers.map((u) => {
               const displayName = u.full_name || 'Anonymous Member';
               const initial = displayName.charAt(0).toUpperCase();
 
@@ -351,7 +363,16 @@ export const UsersPage = () => {
               );
             })}
           </div>
-        </>
+
+          {/* Pagination Controls */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            pageSize={pageSize}
+            onPageChange={setCurrentPage}
+          />
+        </div>
       )}
 
       {/* User Profile Details Modal */}
