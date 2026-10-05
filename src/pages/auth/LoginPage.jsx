@@ -71,11 +71,13 @@ export const LoginPage = () => {
           <div className="login-visual-content">
             <div className="login-visual-top">
               <div className="login-visual-brand-badge">
-                <img
-                  src="/logo.png"
-                  alt="Dr. Cubie Inspiration"
-                  className="login-visual-badge-logo"
-                />
+                <div className="login-visual-logo-box">
+                  <img
+                    src="/logo.png"
+                    alt="Dr. Cubie Inspiration"
+                    className="login-visual-badge-logo"
+                  />
+                </div>
                 <span>Dr. Cubie Inspiration</span>
               </div>
             </div>
@@ -197,7 +199,13 @@ export const LoginPage = () => {
           {/* Top Brand & Quote Banner */}
           <div className="stitch-mobile-header">
             <div className="stitch-mobile-brand-pill">
-              <Sparkles size={15} className="stitch-pill-icon" />
+              <div className="login-visual-logo-box">
+                <img
+                  src="/logo.png"
+                  alt="Dr. Cubie Inspiration"
+                  className="login-visual-badge-logo"
+                />
+              </div>
               <span>Dr. Cubie Inspiration</span>
             </div>
 
