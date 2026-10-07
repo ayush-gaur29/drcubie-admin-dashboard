@@ -157,9 +157,6 @@ export const sendNotification = async ({
       pushPayload.userId = specificUserId;
     }
 
-    if (targetAudience === 'specific' && insertedRows?.[0]?.id) {
-      pushPayload.notificationId = insertedRows[0].id;
-    }
 
     // 4. Invoke send-push-notification Edge Function
     // Automatically includes active admin JWT in Authorization header & apikey
