@@ -165,12 +165,24 @@ export const NotificationsPage = () => {
     try {
       let relType = formData.destination;
       let relId = formData.selectedContentId;
+      let route = null;
 
       if (formData.destination === 'general') {
         relType = null;
         relId = null;
-      } else if (formData.destination === 'today' || formData.destination === 'vip') {
+        route = 'notifications';
+      } else if (formData.destination === 'today') {
         relId = null;
+        route = 'today';
+      } else if (formData.destination === 'vip') {
+        relId = null;
+        route = 'vip-pass';
+      } else if (formData.destination === 'spark') {
+        route = relId ? `spark/${relId}` : 'today';
+      } else if (formData.destination === 'video') {
+        route = relId ? `videos/${relId}` : 'videos';
+      } else if (formData.destination === 'audio') {
+        route = relId ? `audios/${relId}` : 'audios';
       }
 
       const result = await sendNotification({
@@ -180,10 +192,16 @@ export const NotificationsPage = () => {
         targetAudience: formData.targetAudience,
         specificUserId: formData.specificUserId,
         relatedContentType: relType,
-        relatedContentId: relId
+        relatedContentId: relId,
+        route
       });
 
-      showToast('success', `Broadcast dispatched to ${result.count} member(s).`);
+      const sentCount = result?.pushResult?.sentCount;
+      let toastMsg = `Broadcast dispatched to ${result.count} member(s).`;
+      if (typeof sentCount === 'number') {
+        toastMsg += ` (${sentCount} push delivered)`;
+      }
+      showToast('success', toastMsg);
       setModalOpen(false);
       loadNotifications();
     } catch (err) {
